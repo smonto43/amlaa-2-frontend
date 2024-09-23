@@ -1,14 +1,14 @@
 from collections import defaultdict
 import streamlit as st
 from pathlib import Path
-from src.models.predict_model import get_sales_prediction
-from src.features.build_features import add_answer
+from src.models.predict_model import get_sales_prediction, get_forecast
 from src.features.dates import extract_info_date
 import pandas as pd
 import os
 
 home = "Home"
 data = "Prective Model"
+forecast = "Forecast"
 
 
 
@@ -44,45 +44,29 @@ def render_data():
     year, month, day_of_month,day_of_week, is_weekend = extract_info_date(date_input)
 
     if st.button('Predict'):
-        st.write(get_sales_prediction(os.getenv("API_URL"), store_id, item_id, day_of_week, month, year, day_of_month, is_weekend))
+        st.write(get_sales_prediction("https://assignment-2-qj7c.onrender.com/predict", store_id, item_id, day_of_week, month, year, day_of_month, is_weekend))
+        
     
-    
 
 
-def render_features():
-    st.subheader("Feature Engineering Process")
-    st.write("The following transformations were applied to the following datasets:")
-    st.subheader("Adding Answer to Universe Feature example:")
-    df = pd.DataFrame(
-        [
-            {"name": "alice", "favorite_animal": "dog"},
-            {"name": "bob", "favorite_animal": "cat"},
-        ]
-    )
-    st.write("Initial data")
-    st.write(df)
-    df = add_answer(df)
-    st.write("Transformed data")
-    st.write(df)
+def forecasting():
+    st.image('images/OIP.jpeg', width=200)
+    st.subheader("Forecasting Model")
+    st.write("El siguiente modelo les permite predecir las ventas de una tienda y un item en especifico para la fecha dada:")
 
+    date_input = st.date_input('Initial date forecasting: ')
 
-def render_training():
-    st.subheader("Model Training Overview")
-    st.write("The following models and hyperparameters were tested:")
-    for sub_path in (
-        x
-        for x in Path("models").iterdir()
-        if x.is_file() and not x.name.startswith(".")
-    ):
-        st.subheader(sub_path.name)
-        st.write("Size in bytes: ", len(sub_path.read_bytes()))
+    if st.button('Predict'):
+        st.write(get_forecast("https://assignment-2-qj7c.onrender.com/sales/national", date_input))
 
-display_page = st.sidebar.radio("View Page:", (home, data))
+display_page = st.sidebar.radio("View Page:", (home, data, forecast))
 
 
 if display_page == home:
     render_home()
 elif display_page == data:
     render_data()
+elif display_page == forecast:
+    forecasting()
 
 
