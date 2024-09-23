@@ -1,62 +1,52 @@
 from collections import defaultdict
 import streamlit as st
 from pathlib import Path
-from src.models.predict_model import make_prediction
+from src.models.predict_model import get_sales_prediction
 from src.features.build_features import add_answer
+from src.features.dates import extract_info_date
 import pandas as pd
+import os
 
-home = "Project Home"
-data = "Data Sources"
-features = "Feature Engineering"
-training = "Model Training"
+home = "Home"
+data = "Prective Model"
+
 
 
 def render_home():
-    st.subheader("Project Home Page")
-    st.write("streamlit app ssignment2")
+    
+    st.image('images/UTS-Logo-Syd.jpg')
+    st.header("Santiago Montoya - App Assigment 2")
+    st.subheader("36120 Advanced Machine Learning Application")
+    st.write("**Student Id:** 24898381")
 
-    st.subheader("Make a prediction")
-    with st.form("model_prediciton"):
-        input_data = st.text_input(
-            "Model Input", "Enter some input features to make a prediction"
-        )
-        is_submitted = st.form_submit_button()
 
-    if not is_submitted:
-        st.info("Press Submit to Make a Prediction")
-        st.stop()
-    st.subheader("Input:")
-    st.write(input_data)
-    prediction = make_prediction(input_data)
-    st.subheader("Prediction:")
-    st.write(prediction)
 
 
 def render_data_directory(dir: Path):
-    st.subheader(dir.name)
-    file_types = defaultdict(int)
-    all_files = []
-    for sub_path in (
-        x for x in dir.iterdir() if x.is_file() and not x.name.startswith(".")
-    ):
-        file_types[sub_path.suffix] += 1
-        all_files.append(sub_path.name)
-    st.write("Total Files in Directory: ", len(all_files))
-    if len(all_files):
-        st.write("Total Files per File Type")
-        st.json(file_types)
-        with st.expander("All Files"):
-            st.json(all_files)
-    for sub_dir in (
-        x for x in dir.iterdir() if x.is_dir() and not x.name.startswith(".")
-    ):
-        render_data_directory(sub_dir)
+    st.subheader('Predictive Model')
+
+
 
 
 def render_data():
-    st.subheader("Data Source Information")
-    st.write("The following data were gathered from the following sources:")
-    render_data_directory(Path("data"))
+    st.image('images/machine-learning.jpg', width=200)
+    st.subheader("Predictive Model")
+    st.write("El siguiente modelo les permite predecir las ventas de una tienda y un item en especifico para la fecha dada:")
+    date_input = st.date_input('date formar: YYYY-MM-DD: ')
+    stores = ['CA_1', 'CA_2', 'CA_3', 'CA_4', 'TX_1', 'TX_2', 'TX_3', 'WI_1',
+            'WI_2', 'WI_3']
+    item = ['HOBBIES_1_001', 'HOBBIES_1_002', 'HOBBIES_1_003',
+       'FOODS_3_825', 'FOODS_3_826', 'FOODS_3_827']
+    store_id = st.selectbox("Select a store",stores)
+    item_id = st.selectbox("Select a item",item)
+
+
+    year, month, day_of_month,day_of_week, is_weekend = extract_info_date(date_input)
+
+    if st.button('Predict'):
+        st.write(get_sales_prediction(os.getenv("API_URL"), store_id, item_id, day_of_week, month, year, day_of_month, is_weekend))
+    
+    
 
 
 def render_features():
@@ -87,14 +77,12 @@ def render_training():
         st.subheader(sub_path.name)
         st.write("Size in bytes: ", len(sub_path.read_bytes()))
 
-display_page = st.sidebar.radio("View Page:", (home, data, features, training))
-st.header("amlaa-2-frontend")
+display_page = st.sidebar.radio("View Page:", (home, data))
+
 
 if display_page == home:
     render_home()
 elif display_page == data:
     render_data()
-elif display_page == features:
-    render_features()
-elif display_page == training:
-    render_training()
+
+
