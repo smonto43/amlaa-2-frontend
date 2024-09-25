@@ -20,7 +20,7 @@ def get_sales_prediction(api_url, store_id, item_id, day_of_week, month, year, d
     - Predicted sales (float) or an error message.
     """
     # Prepare the data to be sent to the API
-    data = {
+    params = {
         "store_id": store_id,
         "item_id": item_id,
         "day_of_week": day_of_week,
@@ -32,7 +32,7 @@ def get_sales_prediction(api_url, store_id, item_id, day_of_week, month, year, d
 
     try:
         # Make the POST request to the API
-        response = requests.post(api_url, data=json.dumps(data), headers={"Content-Type": "application/json"})
+        response = requests.get(api_url, params=params)
         
         # Check if the request was successful
         if response.status_code == 200:
