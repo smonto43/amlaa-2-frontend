@@ -25,11 +25,11 @@ def render_home():
     st.header("Santiago Montoya - App Assigment 2")
     st.subheader("36120 Advanced Machine Learning Application")
     st.write("**Student Id:** 24898381")
+    st.write('Wait for the welcome message to start using the app (dont try to use this app using UTS wifi, given that it blocks the render app)')
 
 
     try:
         response = requests.get("https://assignment-2-qj7c.onrender.com/health/")
-        # Mostrar el status code siempre
         st.write(f"Status code: {response.status_code}")
         
         if response.status_code == 200:
@@ -48,9 +48,8 @@ def render_data():
     st.write("Predicts sales of a specific item in a specific shop for a given date.")
     
     date_input = st.date_input('date formar: YYYY-MM-DD: ')
-    #data = load_data()
 
-    with open('data/processed/store_items_ids.json') as f:  # Asumiendo que tienes un archivo data.json
+    with open('data/processed/store_items_ids.json') as f:  
         data = json.load(f)
     stores, item = data['store_id'], data['item_id']
 
@@ -78,22 +77,20 @@ def forecasting():
 
 
 def api_check():
-    # Display an image at the beginning
+ 
     st.image('images/reading-fastapi.jpg', width=200)
-    
-    # Component title and description
+
     st.subheader("Project Overview")
     st.write("This is the response from the root endpoint (‘/’). Below is the project description, its various endpoints, and the expected responses.")
 
-    # Fetch the API response from the FastAPI backend
+
     response = requests.get("https://assignment-2-qj7c.onrender.com/")
     
-    # Check if the request was successful
+
     if response.status_code == 200:
-        # Parse the response as JSON
+  
         data = response.json()
         
-        # Extract relevant values into separate variables
         project_description = data.get('project_description', 'Not available')
         endpoints = data.get('endpoints', {})
         github_repo_backend = data.get('github_repo_backend', 'Not available')
@@ -101,47 +98,40 @@ def api_check():
         render_app_link = data.get('render_app_link', 'Not available')
         streamlit_link = data.get('streamlit_link', 'Not available')
         
-        # Display the project description
         st.subheader("Project Description")
         st.write(project_description)
         
-        # Display GitHub and app links
+
         st.write("**Backend GitHub Repo:** [Link](" + github_repo_backend + ")")
         st.write("**Frontend GitHub Repo:** [Link](" + github_repo_frontend + ")")
         st.write("**Render App Link:** [Link](" + render_app_link + ")")
         st.write("**Streamlit Link:** [Link](" + streamlit_link + ")")
 
-        # Display the available endpoints in an organised manner
         st.subheader("Available Endpoints")
         for endpoint, details in endpoints.items():
             st.markdown(f"### Endpoint: `{endpoint}`")
-            
-            # If it's a string (like the root endpoint "/"), show the description
+
             if isinstance(details, str):
                 st.markdown(f"**Description**: {details}")
             else:
-                # For more detailed endpoints
+
                 st.markdown(f"**Description**: {details.get('description', 'Not available')}")
                 st.markdown(f"**Method**: {details.get('method', 'Not available')}")
-                
-                # Show input parameters if available
+    
                 input_params = details.get('input_parameters', None)
                 if input_params:
                     st.markdown("**Input Parameters**:")
                     for param, description in input_params.items():
                         st.markdown(f"- **{param}**: {description}")
-                
-                # Show the expected output format if available
+
                 output_format = details.get('output_format', None)
                 if output_format:
                     st.markdown("**Expected Output Format**:")
-                    st.json(output_format)  # Display the output format as JSON
+                    st.json(output_format) 
             
-            # Divider line between endpoints
             st.markdown("---")
     
     else:
-        # Show an error message in case of failure
         st.error(f"Error {response.status_code}: {response.text}")
 
 
